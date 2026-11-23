@@ -342,6 +342,10 @@ model Project {
   // AI observability: false keeps prompts, completions and tool definitions
   // out of ai_events; tokens, cost and latency are stored either way.
   aiStoreContent             Boolean       @default(true)
+  // Written by the project's team in the AI settings; added to the AI
+  // assistant's system prompt so every chat starts knowing what the events,
+  // properties and terms of this project mean.
+  aiAssistantContext         String?
   /// [IPrismaProjectFilters]
   filters                    Json          @default("[]")
   // Set once when the project's first event arrives (activation checklist,

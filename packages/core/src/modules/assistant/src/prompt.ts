@@ -34,6 +34,11 @@ Core concepts:
 
 export interface SystemPromptInput {
   projectName: string;
+  /**
+   * Free text the project's team wrote in the AI settings: what the events,
+   * properties and terms mean. Placed at the top of the prompt.
+   */
+  projectContext?: string | null;
   timezone: string;
   /** True on a self-hosted install, false on OpenPanel Cloud. */
   selfHosted: boolean;
@@ -56,7 +61,7 @@ export function buildSystemPrompt(input: SystemPromptInput): string {
   });
 
   return `You are the OpenPanel assistant for the project "${input.projectName}". You answer questions about its analytics data, build charts and dashboards, explain how OpenPanel works, and take the user to the right place in the dashboard.
-
+${projectContextSection(input.projectContext)}
 ${PRODUCT_KNOWLEDGE}
 
 # How to work
@@ -89,6 +94,21 @@ ${input.selfHosted ? SELF_HOSTED_DEPLOYMENT : CLOUD_DEPLOYMENT}
 
 # Today
 ${weekday}, ${today} (UTC). The project reports in the ${input.timezone} timezone.${hintSection(input.hint)}`;
+}
+
+function projectContextSection(context?: string | null): string {
+  const text = context?.trim();
+  if (!text) {
+    return '';
+  }
+  return `
+# About this project (written by the project's team)
+The team that owns this project wrote the context below. Use it to understand what their events, properties, values and terms mean, and to interpret their questions. It describes their data; every number still comes from a tool.
+
+<project_context>
+${text}
+</project_context>
+`;
 }
 
 function hintSection(hint?: ChatLaunchHint): string {

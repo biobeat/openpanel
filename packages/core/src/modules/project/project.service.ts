@@ -384,6 +384,7 @@ export function createProjectService(
       crossDomain?: boolean;
       allowUnsafeRevenueTracking?: boolean;
       aiStoreContent?: boolean;
+      aiAssistantContext?: string | null;
       filters?: IProjectFilters[];
     }
   ): Promise<IServiceProject | null> {
@@ -416,6 +417,9 @@ export function createProjectService(
     }
     if (input.aiStoreContent !== undefined) {
       updateData.aiStoreContent = input.aiStoreContent;
+    }
+    if (input.aiAssistantContext !== undefined) {
+      updateData.aiAssistantContext = input.aiAssistantContext?.trim() || null;
     }
     if (input.filters !== undefined) {
       updateData.filters = input.filters;

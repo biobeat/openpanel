@@ -69,6 +69,7 @@ export const assistantRoutes = defineRoutes((app) =>
         userId,
         timezone: settings.timezone || 'UTC',
         projectName: project.name,
+        projectContext: project.aiAssistantContext,
         abortSignal: request.signal,
       });
     },

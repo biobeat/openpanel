@@ -42,6 +42,8 @@ export interface RunChatInput {
   userId: string;
   timezone: string;
   projectName: string;
+  /** The project's custom assistant context from the AI settings, if any. */
+  projectContext?: string | null;
   abortSignal?: AbortSignal;
 }
 
@@ -196,6 +198,7 @@ export async function runChat(
             model: resolveChatModel(config, entry),
             instructions: buildSystemPrompt({
               projectName: input.projectName,
+              projectContext: input.projectContext,
               timezone: input.timezone,
               selfHosted: config.selfHosted,
               hint: request.hint,

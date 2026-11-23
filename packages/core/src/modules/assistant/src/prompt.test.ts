@@ -34,4 +34,28 @@ describe('buildSystemPrompt', () => {
       )
     ).toBe(true);
   });
+
+  test('the project context sits near the top of the prompt', () => {
+    const prompt = buildSystemPrompt({
+      ...base,
+      selfHosted: false,
+      projectContext: '  "sys" is systolic pressure in mmHg.  ',
+    });
+    expect(prompt).toContain(
+      '<project_context>\n"sys" is systolic pressure in mmHg.\n</project_context>'
+    );
+    expect(prompt.indexOf('<project_context>')).toBeLessThan(
+      prompt.indexOf('# What OpenPanel is')
+    );
+  });
+
+  test('a blank project context adds nothing', () => {
+    const withBlank = buildSystemPrompt({
+      ...base,
+      selfHosted: false,
+      projectContext: '   ',
+    });
+    expect(withBlank).toBe(buildSystemPrompt({ ...base, selfHosted: false }));
+    expect(withBlank).not.toContain('project_context');
+  });
 });

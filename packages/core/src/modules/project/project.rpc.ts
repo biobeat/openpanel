@@ -76,6 +76,7 @@ export const projectRouter = createTRPCRouter({
           crossDomain: input.crossDomain,
           allowUnsafeRevenueTracking: input.allowUnsafeRevenueTracking,
           aiStoreContent: input.aiStoreContent,
+          aiAssistantContext: input.aiAssistantContext,
           filters: input.filters,
         }
       );

@@ -22,6 +22,12 @@ export const zCreateProject = z.object({
   types: z.array(zProjectType).optional().default([]),
 });
 
+export const AI_ASSISTANT_CONTEXT_MAX_LENGTH = 10_000;
+export const zAiAssistantContext = z
+  .string()
+  .max(AI_ASSISTANT_CONTEXT_MAX_LENGTH)
+  .nullable();
+
 export const zUpdateProject = z.object({
   name: z.string().min(1).optional(),
   domain: z.string().url().or(z.literal('')).or(z.null()).optional(),
@@ -29,6 +35,7 @@ export const zUpdateProject = z.object({
   crossDomain: z.boolean().optional(),
   allowUnsafeRevenueTracking: z.boolean().optional(),
   aiStoreContent: z.boolean().optional(),
+  aiAssistantContext: zAiAssistantContext.optional(),
 });
 
 export const zProjectFilterIp = z.object({
@@ -64,6 +71,7 @@ export const zProject = z.object({
   crossDomain: z.boolean().default(false),
   allowUnsafeRevenueTracking: z.boolean().default(false),
   aiStoreContent: z.boolean().default(true),
+  aiAssistantContext: zAiAssistantContext.default(null),
 });
 export type IProjectEdit = z.infer<typeof zProject>;
 
@@ -76,5 +84,6 @@ export const zProjectUpdate = z.object({
   crossDomain: z.boolean().optional(),
   allowUnsafeRevenueTracking: z.boolean().optional(),
   aiStoreContent: z.boolean().optional(),
+  aiAssistantContext: zAiAssistantContext.optional(),
 });
 export type IProjectUpdate = z.infer<typeof zProjectUpdate>;
