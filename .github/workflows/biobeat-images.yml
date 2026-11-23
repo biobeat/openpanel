@@ -3,19 +3,11 @@
 #   ghcr.io/biobeat/openpanel-api:<tag>
 #   ghcr.io/biobeat/openpanel-dashboard:<tag>
 #
-# Tags: `biobeat-main` (the latest build of that branch) and `sha-<7 chars>` (that exact commit, for pinning and
-# rollback). Runs on every push to biobeat-main, or by hand from the Actions tab.
+# Tags: the branch name (e.g. `biobeat-main`, the latest build of that branch) and `sha-<7 chars>` (that exact commit,
+# for pinning and rollback). Runs only by hand: Actions → Biobeat images → Run workflow, then pick the branch.
 name: Biobeat images
 
 on:
-  push:
-    branches:
-      - biobeat-main
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "apps/public/**"
-      - "packages/sdks/**"
   workflow_dispatch:
 
 concurrency:
