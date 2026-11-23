@@ -1,42 +1,10 @@
 name: Docker Build and Push
 
+# Biobeat fork: upstream's release pipeline (tests, multi-arch images under openpanel-dev, version tags) runs only
+# by hand here. The fork's images come from biobeat-images.yml.
 on:
   workflow_dispatch:
-  push:
-    # Branches only: the self-hosting tag has its own workflow, and the v* tags
-    # this workflow pushes must not start another build.
-    branches:
-      - "**"
-    paths-ignore:
-      # README and docs
-      - "**/README*"
-      - "**/readme*"
-      - "**/*.md"
-      - "**/docs/**"
-      - "**/CHANGELOG*"
-      - "**/LICENSE*"
-      # SDKs published to npm and not in the images. @openpanel/ai and
-      # @openpanel/sdk are left out of this list: core imports them, so the
-      # api image ships them and a change there needs the build and smoke.
-      - "packages/sdks/_info/**"
-      - "packages/sdks/astro/**"
-      - "packages/sdks/express/**"
-      - "packages/sdks/nextjs/**"
-      - "packages/sdks/nuxt/**"
-      - "packages/sdks/react-native/**"
-      - "packages/sdks/web/**"
-      # Public app (docs/marketing, not part of Docker deploy)
-      - "apps/public/**"
-      # Dev / tooling
-      - "**/.vscode/**"
-      - "**/.cursor/**"
-      - "**/.env.example"
-      - "**/.env.*.example"
-      - "**/.gitignore"
-      - "**/.eslintignore"
-      - "**/.prettierignore"
 
-# Read-only by default; the jobs that push images or tags widen it themselves.
 permissions:
   contents: read
 

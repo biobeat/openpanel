@@ -1,0 +1,83 @@
+# Biobeat's images: the api and dashboard for ARM (AWS t4g / Graviton), pushed to the GitHub Container Registry.
+#
+#   ghcr.io/biobeat/openpanel-api:<tag>
+#   ghcr.io/biobeat/openpanel-dashboard:<tag>
+#
+# Tags: `biobeat-main` (the latest build of that branch) and `sha-<7 chars>` (that exact commit, for pinning and
+# rollback). Runs on every push to biobeat-main, or by hand from the Actions tab.
+name: Biobeat images
+
+on:
+  push:
+    branches:
+      - biobeat-main
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "apps/public/**"
+      - "packages/sdks/**"
+  workflow_dispatch:
+
+concurrency:
+  group: biobeat-images-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io/biobeat
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: api
+            dockerfile: apps/api/Dockerfile
+            build_args: DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+          - app: dashboard
+            dockerfile: apps/start/Dockerfile
+            build_args: ""
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Tags
+        id: tags
+        run: |
+          image="$REGISTRY/openpanel-${{ matrix.app }}"
+          branch="$(echo "${{ github.ref_name }}" | sed 's#/#-#g')"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "list=$image:$branch,$image:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/arm64
+          build-args: ${{ matrix.build_args }}
+          tags: ${{ steps.tags.outputs.list }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=registry,ref=${{ steps.tags.outputs.image }}:buildcache
+          cache-to: type=registry,ref=${{ steps.tags.outputs.image }}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
+          push: true
+
+      - name: Summary
+        run: echo "Pushed ${{ steps.tags.outputs.list }}" >> "$GITHUB_STEP_SUMMARY"
